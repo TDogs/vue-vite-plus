@@ -1,36 +1,30 @@
 import request from "@/utils/request";
 import { tokenName } from "@/config";
 
-export function getMoviesList(accessToken, params = {}) {
+export function getMoviesList(params = {}) {
   return request({
     url: "/admin/auth/movies",
     method: "get",
     params: {
-      [tokenName]: accessToken,
       ...params,
     },
   });
 }
 
 // 删除
-export function deleteMovieById(accessToken, payload = {}) {
+export function deleteMovieById(id) {
   return request({
-    url: "/admin/auth/movies/delete",
+    url: "/admin/auth/movies/del/"+id,
     method: "post",
-    data: {
-      [tokenName]: accessToken,
-      ...payload,
-    },
   });
 }
 
 // 更新
-export function updateMovieById(accessToken, payload = {}) {
+export function updateMovieById( payload = {}) {
   return request({
     url: "/admin/auth/movies/update/"+payload.id,
     method: "post",
     data: {
-      [tokenName]: accessToken,
       ...payload,
     },
   });

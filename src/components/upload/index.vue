@@ -7,10 +7,11 @@
       :before-upload="beforeUpload"
       :on-success="onUploadSuccess"
       :on-remove="onRemove"
+      :on-exceed="onUploadExceed"
       :file-list="fileList"
       :limit="limit"
       :accept="acceptAttr"
-      multiple
+      :multiple="limit > 1"
     >
       <el-icon><Plus /></el-icon>
     </el-upload>
@@ -21,6 +22,7 @@
 <script>
 import { Plus } from "@element-plus/icons-vue";
 import { uploadFile } from "@/api/upload";
+import { baseAlert } from "@/utils/message";
 
 
 // function pickImageUrl(res) {
@@ -103,6 +105,17 @@ export default {
     },
 
     /**
+     * limit 事件提醒 当前选中文件=files 当前列表=fileList
+     */
+    onUploadExceed(files, fileList) {
+      const msg =
+        this.limit === 1
+          ? "当前限制上传 1 张图片，请先删除现有图片后再选择新图。"
+          : `当前最多可上传 ${this.limit} 张（已有 ${fileList.length} 张），本次选择了 ${files.length} 张，请先删除部分后再试。`;
+      baseAlert(msg);
+    },
+
+    /**
      * 上传前文件验证
      */
     beforeUpload(rawFile) {
@@ -139,7 +152,7 @@ export default {
       console.log(options);
       console.log("=========doCustomUpload========");
       try {
-        const res = await uploadFile(file,this.id);
+        const res = await uploadFile(file, this.id);
         onSuccess(res);
       } catch (e) {
         onError(e);

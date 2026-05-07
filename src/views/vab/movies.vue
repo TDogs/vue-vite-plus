@@ -328,7 +328,7 @@
             v-model:poster_urls="editForm.gallery_urls"
             @update:poster_urls="handlePosterUrlsUpdate"
             @remove="handlePosterRemove"
-            :limit="6"
+            :limit="1"
             :max-size-mb="5"
           />
         </el-form-item>
@@ -575,15 +575,13 @@ export default {
     handleEdit(row) {
       this.editMovieId = row?.id ?? null;
       const posterRaw = row?.poster_url ?? "";
-      // const gallery_urls = Array.isArray(row?.gallery_urls)
-      //   ? row.gallery_urls
-      //   : posterRaw.split(/[,，]/).filter(Boolean);
+      const gallery_urls = posterRaw.split(/[,，]/);
 
       // 如下是升级后支持格式：后端应返回格式 测试用
-     let gallery_urls = [
-          { id: 1, path: "https://p0.meituan.net/movie/70de97ebb6b5251ecb7c3f6d7a782a7f189340.jpg@464w_644h_1e_1c" },
-          { id: 2, path: "https://p0.meituan.net/movie/396266d8b711958841b3536a3fa7b868211445.jpg@464w_644h_1e_1c" },
-        ];
+    //  let gallery_urls = [
+    //       { id: 1, path: "https://p0.meituan.net/movie/70de97ebb6b5251ecb7c3f6d7a782a7f189340.jpg@464w_644h_1e_1c" },
+    //       { id: 2, path: "https://p0.meituan.net/movie/396266d8b711958841b3536a3fa7b868211445.jpg@464w_644h_1e_1c" },
+    //     ];
       console.log("=========handleEdit========");
       console.log(gallery_urls);
       console.log("=========handleEdit========");
@@ -617,7 +615,7 @@ export default {
         );
 
         this.loading = true;
-        res = await deleteMovieById(this.getToken(), { id });
+        res = await deleteMovieById(row.id );
         if(res.code === 200) {
           this.$message.success("删除成功");
         } else {
@@ -671,7 +669,7 @@ export default {
 
       try {
         this.loading = true;
-        await updateMovieById(this.getToken(), { id, ...next });
+        await updateMovieById({ id, ...next });
         this.editDrawerVisible = false;
         this.$message.success("编辑成功");
       } catch (e) {
