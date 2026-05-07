@@ -60,7 +60,7 @@ const handleCode = (code, msg) => {
 
 // 请求重试配置
 const retryConfig = {
-  retry: 3, // 重试次数
+  retry: 1, // 重试次数
   retryDelay: 1000, // 重试间隔时间
 };
 
