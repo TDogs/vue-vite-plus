@@ -12,7 +12,7 @@ import eventBus from "@/utils/eventBus";
 import { title } from "@/config";
 // 导入mock
 import { mockXHR } from "@/utils/static";
-import { isMockApi } from "@/config/app.config";
+import { appConfig } from "@/config/app.config";
 
 /**
  * @author https://github.com/zxwk1998/vue-admin-better （不想保留author可删除）
@@ -44,7 +44,7 @@ window.$eventBus = eventBus;
 window.$baseTitle = title;
 
 // 根据统一配置决定是否启用 mock
-if (isMockApi) {
+if (appConfig.dataSource === "mock") {
   mockXHR();
   console.log("当前为 Mock 数据源，所有接口请求将被 Mock 拦截");
 }

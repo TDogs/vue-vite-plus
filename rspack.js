@@ -6,7 +6,7 @@ process.noDeprecation = true;
 const { rspack } = require("@rspack/core");
 const path = require("path");
 const fs = require("fs");
-const { isMockApi } = require("./src/config/app.config");
+const { appConfig } = require("./src/config/app.config");
 // 引入layouts中的donationConsole函数
 const { donationConsole } = require("./layouts");
 
@@ -23,7 +23,9 @@ process.env.NODE_ENV = mode;
 process.env.WEBPACK_ENV = mode;
 process.env.BABEL_ENV = mode;
 // 按 dataSource 配置决定是否启用 mock
-process.env.VUE_APP_MOCK_ENABLE = String(isMockApi);
+process.env.VUE_APP_MOCK_ENABLE = String(
+  appConfig.dataSource === "mock"
+);
 console.log("设置环境变量 NODE_ENV =", process.env.NODE_ENV);
 console.log(
   "设置环境变量 VUE_APP_MOCK_ENABLE =",
@@ -87,7 +89,7 @@ if (mode === "production") {
     const devServerOptions = config.devServer || {};
 
     // 仅在 mock 数据源时启动 mock server
-    if (isMockApi && !devServerOptions.setupMiddlewares) {
+    if (appConfig.dataSource === "mock" && !devServerOptions.setupMiddlewares) {
       devServerOptions.setupMiddlewares = (middlewares, devServer) => {
         if (!devServer) {
           throw new Error("dev-server is not defined");
@@ -96,7 +98,10 @@ if (mode === "production") {
         mockServer(devServer.app);
         return middlewares;
       };
-    } else if (isMockApi && devServerOptions.setupMiddlewares) {
+    } else if (
+      appConfig.dataSource === "mock" &&
+      devServerOptions.setupMiddlewares
+    ) {
       const originalSetup = devServerOptions.setupMiddlewares;
       devServerOptions.setupMiddlewares = (middlewares, devServer) => {
         if (devServer?.app) {
@@ -137,7 +142,7 @@ if (mode === "production") {
         if (originalBefore) {
           originalBefore(app, server);
         }
-        if (isMockApi) {
+        if (appConfig.dataSource === "mock") {
           const mockServer = require("./mock/index");
           mockServer(app);
         }

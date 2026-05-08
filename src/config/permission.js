@@ -173,7 +173,6 @@ router.beforeEach(async (to, from, next) => {
         try {
           let permissions;
           if (!loginInterception) {
-            //settings.js loginInterception为false时，创建虚拟权限
             await store.dispatch("user/setPermissions", ["admin"]);
             permissions = ["admin"];
           } else {

@@ -1,11 +1,11 @@
 /**
  * @description 导出默认网路配置
  **/
-const { appConfig, isRealApi } = require("./app.config");
+const { appConfig } = require("./app.config");
 
 const network = {
   // 统一从 app.config.js 读取接口来源
-  baseURL: isRealApi
+  baseURL: appConfig.dataSource === "real"
     ? appConfig.realApiBaseUrl
     : process.env.NODE_ENV === "production"
     ? "./vab-mock-server"

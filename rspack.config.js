@@ -9,7 +9,7 @@ const {
   title,
   devPort,
 } = require("./src/config");
-const { isMockApi, serverConfig } = require("./src/config/app.config");
+const { appConfig } = require("./src/config/app.config");
 const dayjs = require("dayjs");
 const time = dayjs().format("YYYY-M-D HH:mm:ss");
 
@@ -19,7 +19,9 @@ process.env.VUE_APP_UPDATE_TIME = time;
 process.env.BASE_URL = publicPath;
 // 删除这一行，避免覆盖rspack.js中设置的值
 // process.env.NODE_ENV = process.env.NODE_ENV || 'development'
-process.env.VUE_APP_MOCK_ENABLE = String(isMockApi);
+process.env.VUE_APP_MOCK_ENABLE = String(
+  appConfig.dataSource === "mock"
+);
 process.env.VUE_APP_AUTHOR = "vue-admin-better"; // 设置作者
 
 const resolve = (dir) => path.join(__dirname, dir);
@@ -163,7 +165,9 @@ module.exports = {
       "process.env.NODE_ENV": JSON.stringify(mode),
       "process.env.BASE_URL": JSON.stringify(process.env.BASE_URL),
       "process.env.VUE_APP_TITLE": JSON.stringify(process.env.VUE_APP_TITLE),
-      "process.env.VUE_APP_MOCK_ENABLE": JSON.stringify(String(isMockApi)),
+      "process.env.VUE_APP_MOCK_ENABLE": JSON.stringify(
+        String(appConfig.dataSource === "mock")
+      ),
       "process.env.VUE_APP_AUTHOR": JSON.stringify(process.env.VUE_APP_AUTHOR),
       "process.env.VUE_APP_UPDATE_TIME": JSON.stringify(
         process.env.VUE_APP_UPDATE_TIME
@@ -250,7 +254,7 @@ module.exports = {
   devServer: {
     hot: true,
     // 使用配置文件中的端口
-    port: Number(serverConfig.port || devPort || 8091),
+    port: Number(appConfig.port || devPort || 8091),
     historyApiFallback: true,
     static: {
       directory: path.join(__dirname, "public"),
@@ -262,7 +266,7 @@ module.exports = {
       },
     },
     open: {
-      target: [`http://localhost:${Number(serverConfig.port || devPort || 8091)}`],
+      target: [`http://localhost:${Number(appConfig.port || devPort || 8091)}`],
     },
     setupMiddlewares: (middlewares, devServer) => {
       if (!devServer) {
@@ -270,7 +274,7 @@ module.exports = {
       }
 
       // 仅在 mock 数据源时加载 mock 服务器
-      if (isMockApi) {
+      if (appConfig.dataSource === "mock") {
         const mockServer = require("./mock");
         mockServer(devServer.app);
       }

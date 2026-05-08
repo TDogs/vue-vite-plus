@@ -1,7 +1,7 @@
 /**
  * @description 导出默认通用配置
  */
-const { serverConfig } = require("./app.config");
+const { appConfig } = require("./app.config");
 
 const setting = {
   // 生产环境构建文件的目录名
@@ -17,7 +17,7 @@ const setting = {
   //简写
   abbreviation: "vab",
   //开发环境端口号
-  devPort: String(serverConfig.port),
+  devPort: String(appConfig.port),
   //copyright
   copyright: "zxwk1998",
   //是否显示页面底部自定义版权信息

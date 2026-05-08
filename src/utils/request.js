@@ -17,10 +17,10 @@ import { isArray } from "@/utils/validate";
 import { ElLoading, ElMessage } from "element-plus";
 import { pickBy, identity } from "lodash-es";
 import { mock } from "mockjs";
-import { isMockApi } from "@/config/app.config";
+import { appConfig } from "@/config/app.config";
 
 // 根据统一配置按需引入 mock 数据
-if (isMockApi) {
+if (appConfig.dataSource === "mock") {
   const mockContext = require.context("../../mock/controller", true, /\.js$/);
   mockContext.keys().forEach((key) => {
     const mockModule = mockContext(key);
