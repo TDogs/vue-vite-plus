@@ -5,7 +5,7 @@ export function uploadFile(file, id) {
   formData.append("file", file);
   formData.append("id", id);
   return request({
-    url: "/admin/auth/upload",
+    url: "/admin/upload",
     method: "post",
     data: formData,
   });

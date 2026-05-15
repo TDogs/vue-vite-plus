@@ -127,7 +127,6 @@ const actions = {
       return false;
     } catch (error) {
       console.error("获取用户信息失败:", error);
-      ElMessage.error("获取用户信息失败，请重新登录");
       return false;
     }
   },

@@ -7,11 +7,11 @@ export async function login(data) {
     method: "post",
     data,
   });
-} 
+}
 // accessToken
 export function getUserInfo(accessToken) {
   return request({
-    url: "/admin/auth/info",
+    url: "/admin/info",
     method: "get",
     [tokenName]: accessToken,
   });
@@ -19,7 +19,7 @@ export function getUserInfo(accessToken) {
 
 export function logout() {
   return request({
-    url: "/admin/auth/logout",
+    url: "/admin/logout",
     method: "post",
   });
 }

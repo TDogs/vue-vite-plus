@@ -73,7 +73,7 @@ export default {
         if (this.jumpTime) {
           this.jumpTime--;
         } else {
-          this.$router.push({ path: "/" });
+          this.$router.push({ path: "/login" });
           this.$store.dispatch("tabsBar/delOthersRoutes", {
             path: "/",
           });

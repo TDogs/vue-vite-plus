@@ -16,11 +16,11 @@ const network = {
   messageDuration: 3000,
   //最长请求时间
   requestTimeout: 15000,
-  //操作正常code，支持String、Array、int多种类型
-  successCode: [200, 0],
-  //登录失效code
-  invalidCode: 402,
+  // 200 成功；300 业务失败（由页面自行提示）；其余 code 走拦截器
+  successCode: [200, 300],
+  //登录失效code（JWT 过期后端通常返回 401）
+  invalidCode: 401,
   //无权限code
-  noPermissionCode: 401,
+  noPermissionCode: 403,
 };
 module.exports = network;

@@ -38,6 +38,7 @@ export const asyncRoutes = [
     path: "/",
     component: Layout,
     redirect: "/index",
+    meta: { title: "首页", icon: "home", defaultOpen: true },
     children: [
       {
         path: "index",
@@ -52,23 +53,40 @@ export const asyncRoutes = [
     ],
   },
 
-  /* {
-    path: "/test",
+  {
+    path: "/goods",
     component: Layout,
     redirect: "noRedirect",
+    name: "Goods",
+    alwaysShow: true,
+    meta: { title: "商品管理", icon: "box-open" },
     children: [
       {
-        path: "test",
-        name: "Test",
-        component: () => import("@/views/test/index"),
+        path: "list",
+        name: "GoodsIndex",
+        component: () => import("@/views/goods/list.vue"),
         meta: {
-          title: "test",
-          icon: "marker",
-          permissions: ["admin"],
+          title: "商品列表",
+        },
+      },
+      {
+        path: "categories",
+        name: "GoodsCategories",
+        component: () => import("@/views/goods/categories.vue"),
+        meta: {
+          title: "商品分类",
+        },
+      },
+      {
+        path: "attributes",
+        name: "GoodsAttributes",
+        component: () => import("@/views/goods/attributes.vue"),
+        meta: {
+          title: "商品属性",
         },
       },
     ],
-  }, */
+  },
 
   {
     path: "/vab",
@@ -76,7 +94,7 @@ export const asyncRoutes = [
     redirect: "noRedirect",
     name: "Vab",
     alwaysShow: true,
-    meta: { title: "影视管理", icon: "box-open", defaultOpen: true },
+    meta: { title: "影视管理", icon: "box-open" },
     children: [
       // 电影列表：用于侧边栏根据 user/menus 渲染子菜单
       {
@@ -114,15 +132,15 @@ export const asyncRoutes = [
       //     permissions: ["admin"],
       //   },
       // },
-      // {
-      //   path: "icon",
-      //   name: "Icon",
-      //   component: () => import("@/views/vab/icon.vue"),
-      //   meta: {
-      //     title: "图标",
-      //     permissions: ["admin"],
-      //   },
-      // },
+      {
+        path: "icon",
+        name: "Icon",
+        component: () => import("@/views/vab/icon.vue"),
+        meta: {
+          title: "图标",
+          permissions: ["admin"],
+        },
+      },
       // {
       //   path: "form",
       //   name: "Form",
@@ -196,7 +214,7 @@ export const asyncRoutes = [
       //     permissions: ["admin"],
       //   },
       // },
- 
+
       // {
       //   path: "notification",
       //   name: "Notification",
@@ -367,14 +385,14 @@ export const asyncRoutes = [
   //     icon: "",
   //   },
   //   children: [
-      // {
-      //   path: "https://vuejs-core.cn/store",
-      //   meta: {
-      //     title: "模板市场",
-      //     target: "_blank",
-      //     icon: "box-open",
-      //   },
-      // },
+  // {
+  //   path: "https://vuejs-core.cn/store",
+  //   meta: {
+  //     title: "模板市场",
+  //     target: "_blank",
+  //     icon: "box-open",
+  //   },
+  // },
   //   ],
   // },
   // {

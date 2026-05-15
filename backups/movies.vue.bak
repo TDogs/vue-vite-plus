@@ -322,23 +322,15 @@
         </el-form-item>
 
         <el-form-item label="海报">
-          <el-upload
+          <upload-images
+            :id="editMovieId"
             :key="editMovieId"
-            v-model:file-list="posterUploadFileList"
-            list-type="picture-card"
-            :auto-upload="false"
+            v-model:poster_urls="editForm.gallery_urls"
+            @update:poster_urls="handlePosterUrlsUpdate"
+            @remove="handlePosterRemove"
             :limit="1"
-            accept=".jpg,.jpeg,.png,.gif,.webp"
-            :on-change="handlePosterFileChange"
-            :on-remove="handlePosterFileRemove"
-            :on-exceed="handlePosterExceed"
-            :before-upload="beforePosterUpload"
-          >
-            <el-icon><Plus /></el-icon>
-          </el-upload>
-          <div class="poster-upload-hint">
-            最多 1 张，单张不超过 5MB；保存时与表单字段一并 multipart 提交，文件字段名为 poster_url
-          </div>
+            :max-size-mb="5"
+          />
         </el-form-item>
 
         <el-form-item label="drama介绍">
@@ -362,17 +354,17 @@
 
 <script>
 import defaultPosterImg from "@/assets/error_images/404.png";
-import { Plus } from "@element-plus/icons-vue";
 import {
   getMoviesList,
   deleteMovieById,
-  updateMovieByIdFormData,
+  updateMovieById,
 } from "@/api/movies";
 import { getAccessToken } from "@/utils/accessToken";
+import UploadImages from "@/components/upload/index.vue";
 
 export default {
   name: "Customer",
-  components: { Plus },
+  components: { UploadImages },
   data() {
     return {
       currentPage: 1,
@@ -402,10 +394,11 @@ export default {
         duration_minutes: null,
         region: "",
         categories: "",
+        poster_url: "",
+        /** 回显 */
+        gallery_urls: [],
         drama: "",
       },
-      posterUploadFileList: [],
-      editPosterFile: null,
       customerDialogVisible: false,
       detailDialogVisible: false,
       contactDialogVisible: false,
@@ -471,59 +464,27 @@ export default {
     this.loadMovies();
   },
   methods: {
-    basenameFromUrl(url) {
-      try {
-        const u = String(url || "");
-        const noQuery = u.split("?")[0];
-        const seg = noQuery.split("/");
-        return seg[seg.length - 1] || "";
-      } catch {
-        return "";
-      }
+    handlePosterUrlsUpdate(next) {
+      console.log("=========更新后和图片数组========");
+      console.log(next);
+      console.log("=========更新后和图片数组========");
+      const count = Array.isArray(next) ? next.length : 0;
+      this.$message.success(`海报已更新，剩余（${count} 张）`);
     },
 
-    getExistingPosterUrlsFromList() {
-      const list = Array.isArray(this.posterUploadFileList)
-        ? this.posterUploadFileList
-        : [];
-      return list
-        .map((f) => {
-          const u = f?.url;
-          if (!u || typeof u !== "string") return "";
-          if (u.startsWith("blob:")) return "";
-          return u.trim();
-        })
-        .filter(Boolean);
-    },
-
-    beforePosterUpload(rawFile) {
-      const allowed = [".jpg", ".jpeg", ".png", ".gif", ".webp"];
-      const name = (rawFile.name || "").toLowerCase();
-      const dot = name.lastIndexOf(".");
-      const ext = dot >= 0 ? name.slice(dot) : "";
-      if (!ext || !allowed.includes(ext)) {
-        this.$message.error(`仅支持：${allowed.join("、")}`);
-        return false;
-      }
-      const maxBytes = 5 * 1024 * 1024;
-      if (rawFile.size > maxBytes) {
-        this.$message.error("单张图片不能超过 5MB");
-        return false;
-      }
-      return true;
-    },
-
-    handlePosterFileChange(_uploadFile, uploadFiles) {
-      const withRaw = (uploadFiles || []).find((x) => x.raw);
-      this.editPosterFile = withRaw?.raw || null;
-    },
-
-    handlePosterFileRemove() {
-      this.editPosterFile = null;
-    },
-
-    handlePosterExceed() {
-      this.$message.warning("当前限制 1 张，请先删除现有海报后再选择新图。");
+    handlePosterRemove(payload) {
+      /**
+        但是需要后端拼接回显数组如下格式：
+        editForm.gallery_urls = [
+          { id: 1, path: "url1" },
+          { id: 2, path: "url2" },
+        ]
+        */
+      // payload: { id, path }
+      console.log("=========handlePosterRemove========");
+      console.log(payload);
+      console.log(payload.id);
+      console.log("=========handlePosterRemove========");
     },
 
     search() {
@@ -617,17 +578,17 @@ export default {
 
     handleEdit(row) {
       this.editMovieId = row?.id ?? null;
-      this.editPosterFile = null;
       const posterRaw = row?.poster_url ?? "";
-      const urls = posterRaw
-        .split(/[,，]/)
-        .map((s) => s.trim())
-        .filter(Boolean);
-      this.posterUploadFileList = urls.map((url, index) => ({
-        uid: `preset-${this.editMovieId}-${index}-${url.slice(-24)}`,
-        name: this.basenameFromUrl(url) || `poster-${index + 1}`,
-        url,
-      }));
+      const gallery_urls = posterRaw.split(/[,，]/);
+
+      // 如下是升级后支持格式：后端应返回格式 测试用
+    //  let gallery_urls = [
+    //       { id: 1, path: "https://p0.meituan.net/movie/70de97ebb6b5251ecb7c3f6d7a782a7f189340.jpg@464w_644h_1e_1c" },
+    //       { id: 2, path: "https://p0.meituan.net/movie/396266d8b711958841b3536a3fa7b868211445.jpg@464w_644h_1e_1c" },
+    //     ];
+      console.log("=========handleEdit========");
+      console.log(gallery_urls);
+      console.log("=========handleEdit========");
       this.editForm = {
         director: Array.isArray(row?.directors)
           ? row.directors.map((d) => d?.name).filter(Boolean).join("，")
@@ -639,6 +600,7 @@ export default {
         categories: Array.isArray(row?.categories)
           ? row.categories.join("，")
           : "",
+        gallery_urls,
         drama: row?.drama ?? "",
       };
       this.editDrawerVisible = true;
@@ -657,8 +619,8 @@ export default {
         );
 
         this.loading = true;
-        const res = await deleteMovieById(row.id);
-        if (res.code === 200) {
+        res = await deleteMovieById(row.id );
+        if(res.code === 200) {
           this.$message.success("删除成功");
         } else {
           this.$message.error(res.message);
@@ -688,37 +650,30 @@ export default {
         (name) => ({ name })
       );
       const categories = this.parseDelimitedToList(this.editForm.categories);
-
-      const fd = new FormData();
-      fd.append("id", String(id));
-      fd.append("directors", JSON.stringify(directors));
-      fd.append("categories", JSON.stringify(categories));
-      fd.append(
-        "rating",
-        this.editForm.rating != null && this.editForm.rating !== ""
-          ? String(this.editForm.rating)
-          : ""
-      );
-      fd.append("release_date", this.editForm.release_date || "");
-      fd.append(
-        "duration_minutes",
-        this.editForm.duration_minutes != null &&
-          this.editForm.duration_minutes !== ""
-          ? String(this.editForm.duration_minutes)
-          : ""
-      );
-      fd.append("region", this.editForm.region || "");
-      fd.append("drama", this.editForm.drama || "");
-
-      if (this.editPosterFile) {
-        fd.append("poster_url", this.editPosterFile, this.editPosterFile.name);
-      } else {
-        fd.append("poster_url", this.getExistingPosterUrlsFromList().join(","));
-      }
+      // ，美术
+      console.log("=========444=======");
+      console.log(categories);
+      console.log("=========444=======");
+      const galleryRaw = Array.isArray(this.editForm.gallery_urls)
+        ? this.editForm.gallery_urls
+        : [];
+      const gallery = galleryRaw
+        .map((x) => (x && typeof x === "object" ? x.path || x.url : x))
+        .filter(Boolean);
+      const next = {
+        directors,
+        rating: this.editForm.rating,
+        release_date: this.editForm.release_date,
+        duration_minutes: this.editForm.duration_minutes,
+        region: this.editForm.region,
+        categories,
+        poster_url: gallery.length ? gallery.join(",") : "",
+        drama: this.editForm.drama,
+      };
 
       try {
         this.loading = true;
-        await updateMovieByIdFormData(id, fd);
+        await updateMovieById({ id, ...next });
         this.editDrawerVisible = false;
         this.$message.success("编辑成功");
       } catch (e) {
@@ -983,13 +938,6 @@ export default {
   .drama-text {
     white-space: pre-wrap;
     line-height: 1.6;
-  }
-
-  .poster-upload-hint {
-    margin-top: 8px;
-    font-size: 12px;
-    color: var(--el-text-color-secondary);
-    line-height: 1.5;
   }
 
   .header-filters {

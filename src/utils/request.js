@@ -40,13 +40,22 @@ let loadingInstance;
  * @param {*} code
  * @param {*} msg
  */
+const redirectToLogin = () => {
+  const path = router.currentRoute.value.fullPath;
+  if (path && path !== "/login") {
+    router.push(`/login?redirect=${path}`).catch(() => {});
+  } else {
+    router.push("/login").catch(() => {});
+  }
+};
+
 const handleCode = (code, msg) => {
   switch (code) {
     case invalidCode:
-      ElMessage.error(msg || `后端接口${code}异常`);
       store.dispatch("user/resetAccessToken");
       if (loginInterception) {
-        location.reload();
+        ElMessage.error(msg || "登录已过期，请重新登录");
+        redirectToLogin();
       }
       break;
     case noPermissionCode:
@@ -81,7 +90,7 @@ instance.defaults.retryDelay = retryConfig.retryDelay;
 instance.interceptors.request.use(
   (config) => {
     if (store.state.user.accessToken) {
-      config.headers[tokenName] = "bearer "+store.state.user.accessToken;
+      config.headers[tokenName] = "bearer " + store.state.user.accessToken;
     }
 
     if (config.data instanceof FormData) {
@@ -93,7 +102,7 @@ instance.interceptors.request.use(
     if (
       config.data &&
       config.headers["Content-Type"] ===
-        "application/x-www-form-urlencoded;charset=UTF-8"
+      "application/x-www-form-urlencoded;charset=UTF-8"
     )
       config.data = qs.stringify(config.data);
     if (debounce.some((item) => config.url.includes(item)))

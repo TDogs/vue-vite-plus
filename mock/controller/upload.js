@@ -5,7 +5,7 @@ const { handleRandomImage } = require("../utils");
  */
 module.exports = [
   {
-    url: "/admin/auth/upload",
+    url: "/admin/upload",
     type: "post",
     response() {
       return {

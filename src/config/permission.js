@@ -178,7 +178,16 @@ router.beforeEach(async (to, from, next) => {
           } else {
             permissions = await store.dispatch("user/getUserInfo");
             if (!permissions) {
-              throw new Error("获取用户权限失败");
+              // token 失效时 request.js 已清 token 并跳登录，避免重复提示和重复请求
+              if (!store.getters["user/accessToken"]) {
+                next(`/login?redirect=${to.path}`);
+                if (progressBar) VabProgress.done();
+                return;
+              }
+              await store.dispatch("user/resetAccessToken");
+              next(`/login?redirect=${to.path}`);
+              if (progressBar) VabProgress.done();
+              return;
             }
           }
 
